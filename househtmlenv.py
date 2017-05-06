@@ -35,6 +35,10 @@ class search:
             restext = res.text
             print(res.text)
             bs = BeautifulSoup(restext, "html.parser")
+
+            self.itemdict['NowPage'] = bs.find('advertiseitems')['nowpage']
+            self.itemdict['NextPage'] = bool(int(bs.find('advertiseitems')['nextpage']))
+            
             msg = bs.findAll('itemdesc')
             timedif = (62198755200-31536000*2-60*60*16)*1000
             for item in msg:
@@ -80,23 +84,26 @@ def main():
     
     if request.args.get('page'):
         page = request.args.get('page')
-        page_one = url_convert('/HouseBoard.html',page=1)
-        if page == 1:
-            last_page = url_convert('/HouseBoard.html',page=1)
-            next_page = url_convert('/HouseBoard.html',page=2)
-            next_ten_page = url_convert('/HouseBoard.html',page=11)
-        else:
-            last_page = url_convert('/HouseBoard.html',page=int(request.args.get('page')) -1)
-            next_page = url_convert('/HouseBoard.html',page=int(request.args.get('page')) +1)
-            next_ten_page = url_convert('/HouseBoard.html',page=int(request.args.get('page')) +10)
     else:
         page = 1
-        page_one = url_convert('/HouseBoard.html',page=1)
-        last_page = url_convert('/HouseBoard.html',page=1)
-        next_page = url_convert('/HouseBoard.html',page=2)
-        next_ten_page = url_convert('/HouseBoard.html',page=11)
-                    
+        
     SearchRequest.Bebhinn(page, 5, 1)
+
+    current_page = int(SearchRequest.itemdict['NowPage'])
+    To_be_Continue = SearchRequest.itemdict['NextPage']
+    page_one = url_convert('/HouseBoard.html', page=1)
+
+    if current_page == 1:
+        last_page = url_convert('/HouseBoard.html', page=1)
+    else:
+        last_page = url_convert('/HouseBoard.html', page=current_page -1)
+    if To_be_Continue:
+        next_page = url_convert('/HouseBoard.html', page=current_page +1)
+        next_ten_page = url_convert('/HouseBoard.html', page=current_page +10)
+    else:
+        next_page = url_convert('/HouseBoard.html', page=current_page)
+        next_ten_page = url_convert('/HouseBoard.html', page=current_page)
+              
     return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
                                               itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                               itemdict=SearchRequest.itemdict,
@@ -104,7 +111,7 @@ def main():
                            last_page = last_page,
                            next_page = next_page,
                            next_ten_page = next_ten_page,
-                           current_page = page)
+                           current_page = current_page)
 
 
 @app.route('/search', methods=['GET'])
@@ -116,27 +123,32 @@ def BoardSearch():
             SearchWord = ''
             
         SearchType = request.args.get('SearchType')
-        
+
         if request.args.get('page'):
             page = request.args.get('page')
-            page_one = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-            if page == 1:
-                last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-                next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=2)
-                next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=11)
-            else:
-                last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=int(request.args.get('page')) -1)
-                next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=int(request.args.get('page')) +1)
-                next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=int(request.args.get('page')) +10)
         else:
             page = 1
-            page_one = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-            last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-            next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=2)
-            next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=11)
-            
+
         SearchRequest = search(SearchWord, SearchType)
         SearchRequest.Bebhinn(page, 5, 1)
+
+        current_page = int(SearchRequest.itemdict['NowPage'])
+        To_be_Continue = SearchRequest.itemdict['NextPage']
+        page_one = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
+
+        if current_page == 1:
+            last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
+        else:
+            last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page -1)
+        if To_be_Continue:
+            next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page +1)
+            next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page +10)
+        else:
+            next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page)
+            next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page)
+        
+        
+            
         return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
                                                   itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                                   itemdict=SearchRequest.itemdict,
@@ -144,7 +156,7 @@ def BoardSearch():
                                last_page = last_page,
                                next_page = next_page,
                                next_ten_page = next_ten_page,
-                               current_page = page)
+                               current_page = current_page)
     except:
         return redirect(url_for('main'))
     
