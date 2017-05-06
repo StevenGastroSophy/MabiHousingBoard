@@ -3,9 +3,7 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-from flask import Flask
-from flask import render_template
-from flask import request
+from flask import Flask, render_template, request, url_for, redirect
 
 mabitw1url = os.getenv('mabitw1', None)
 print(mabitw1url)
@@ -52,11 +50,16 @@ class search:
                                                                         person=self.itemdict[item]['char_name'],
                                                                         time=self.itemdict[item]['start_time']))
              
-               
-        except PermissionError:
+
+        except :
             print('未發現目標')
 
 app = Flask(__name__)
+
+@app.route('/')
+def redir():
+    return redirect(url_for('main'))
+
 @app.route('/HouseBoard.html', methods=['GET'])
 def main():
     SearchRequest = search('', 1)
@@ -69,19 +72,30 @@ def main():
                                               itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                               itemdict=SearchRequest.itemdict)
 
+
 @app.route('/search', methods=['GET'])
 def BoardSearch():
-    SearchWord = request.args.get('SearchWord')
-    SearchType = request.args.get('SearchType')
-    if request.args.get('page'):
-        page = request.args.get('page')
-    else:
-        page = 1
-    SearchRequest = search(SearchWord, SearchType)
-    SearchRequest.Bebhinn(page, 5, 1)
-    return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
-                                              itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
-                                              itemdict=SearchRequest.itemdict)
+    try:
+        if request.args.get('SearchWord'):
+            SearchWord = request.args.get('SearchWord')
+        else:
+            SearchWord = ''
+        if request.args.get('SearchType'):
+            SearchType = request.args.get('SearchType')
+        else:
+            SearchType = 4
+        if request.args.get('page'):
+            page = request.args.get('page')
+        else:
+            page = 1
+        SearchRequest = search(SearchWord, SearchType)
+        SearchRequest.Bebhinn(page, 5, 1)
+        return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
+                                                  itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
+                                                  itemdict=SearchRequest.itemdict)
+    except:
+        return redirect(url_for('main'))
+    
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=os.environ['PORT'])
 
