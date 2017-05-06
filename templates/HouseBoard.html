@@ -11,7 +11,7 @@
     <form action="/search" method="get">
 	 <td><span style="font-size:150%; color:white;">關鍵字</span></td>
 	 <td><input type="text" name="SearchWord" style="background-color:#02608D; color:white; border-width:1px; font-size:150%;"></td>
-	 <select name="SearchType" style="background-color:#02608D; color:white; border-width:1px; font-size:150%; height:150%;">
+	 <select name="SearchType" style="background-color:#02608D; color:white; border-width:1px; font-size:150%; line-height:200%;">
 	     <option value="4" style="color:white">物品名稱</option>
 	     <option value="1" style="color:white">販賣者</option>
     	     <option value="2" style="color:white">廣告關鍵字</option>
@@ -58,7 +58,7 @@
 　        </tr>
       {% endfor %}
   </table>
-  <ul id="inline">
+  <ul id="inline" style="text-align:center;">
       <li>
 	      <a href={{page_one}}><<</a>
 	  </li>
