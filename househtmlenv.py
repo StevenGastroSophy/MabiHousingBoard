@@ -43,6 +43,17 @@ class search:
                 for itemattr in item.attrs.keys():
                     if itemattr == 'start_time':
                         item[itemattr] = datetime.strftime(datetime.fromtimestamp((int(item[itemattr])-timedif)/1000), '%Y-%m-%d %H:%M:%S')
+                    if itemattr == 'item_price':
+                        pricelist = []
+                        w = int(int(item[itemattr])/10000)
+                        k = int(int(item[itemattr])%10000)
+                        if w  is not 0:
+                            pricelist.append(str(w))
+                        if k  is not 0:
+                            pricelist.append(str(k))
+                        else:
+                            pricelist.append('')
+                        item[itemattr] = '萬'.join(pricelist)
                     self.itemdict[item['item_id']][itemattr] = item[itemattr]
             for item in self.itemlist:
                 print('{name} 的價格是 {price}, 販賣人是 {person}, 張貼於 {time}'.format(name=self.itemdict[item]['item_name'],
