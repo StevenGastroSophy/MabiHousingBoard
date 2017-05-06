@@ -80,10 +80,9 @@ def BoardSearch():
             SearchWord = request.args.get('SearchWord')
         else:
             SearchWord = ''
-        if request.args.get('SearchType'):
-            SearchType = request.args.get('SearchType')
-        else:
-            SearchType = 4
+            
+        SearchType = request.args.get('SearchType')
+        
         if request.args.get('page'):
             page = request.args.get('page')
         else:
