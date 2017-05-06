@@ -82,7 +82,7 @@ def BoardSearch():
     return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
                                               itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                               itemdict=SearchRequest.itemdict)
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+    app.run(host='0.0.0.0',port=os.environ['PORT'])
 
 
