@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>貝婷房屋商店廣告板</title>
+
+  </head>
+  <body bgcolor="#4286AB">
+    <h2 style="text-align:center;color:white">House Shop Advertising Board</h2>
+    <h1 style="text-align:center;color:white">貝婷房屋商店廣告板</h1>
+	<form action="/search" method="get">
+	    <td><font color="white">關鍵字</td>
+	    <td><input type="text" name="SearchWord" style="background-color:#02608D; color:white;"></td>
+	    <select name="SearchType" style="background-color:#02608D; color:white">
+	        <option value="4" >物品名稱</option>
+	    	<option value="1">販賣者</option>
+    		<option value="2">廣告關鍵字</option>
+    	</select>
+    	<input type="submit" value="搜尋" style="background-color:#4286AB; color:white">
+	</form>
+  <style type="text/css">
+  #inline li{display:inline-block;
+             text-align:center;
+             width:40px;
+             height:30px;
+             margin-right:10px;
+             margin-bottom:10px;
+			 color:white;
+             font-size:30px;}
+  
+  #inline li a{ border:2px solid white;
+                display:block;
+		   	    text-align:center;
+                width:40px;
+                height:30px;
+                margin-right:10px;
+                margin-bottom:10px;
+			    text-decoration:none;
+                position:relative;
+                z-index:0;
+                line-height:30px;
+                color:white;
+                font-size:30px;}
+  </style>
+  <table width=800 border=3 bordercolor="#05181F">
+　    <tr>
+　        <td>販賣者</td>
+          <td>物品</td>
+          <td>物品價格</td>
+          <td>廣告內容</td>
+          <td>張貼時間</td>
+    　</tr>
+	  {% for item in itemlist %}
+          <tr>
+		      {% for attr in itemattr %}
+　                <td>{{itemdict[item][attr]}}</td>
+              {% endfor %}
+　        </tr>
+      {% endfor %}
+  </table >
+  <ul id="inline">
+      <li>
+	      <a><<</a>
+	  </li>
+	  <li>
+	      <a><</a>
+	  </li>
+	  <li>1</li>
+	  <li>
+	      <a>></a>
+	  </li>
+	  <li>
+	      <a>>></a>
+	  </li>
+  </ul>
+  
+  </body>
+  
+  
+</html>
