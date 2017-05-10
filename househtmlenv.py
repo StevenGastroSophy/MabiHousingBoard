@@ -71,8 +71,37 @@ class search:
 
 app = Flask(__name__)
 
-def url_convert(url, **attr):
-    return(url+'?'+'&'.join([key+'='+str(attr[key]) for key in attr.keys()]))
+class turnpage:
+    def __init__(self, SearchRequest, url):
+        self.SearchRequest = SearchRequest
+        
+        self.current_page = int(SearchRequest.itemdict['NowPage'])
+        self.To_be_Continue = SearchRequest.itemdict['NextPage']
+        self.page_one = None
+        self.last_page = None
+        self.next_page = None
+        self.url = url
+    def pagelink(self, **attrs):
+        if self.current_page == 1:
+            attrs['page'] = 1
+            self.last_page = self.url_convert(**attrs)
+        else:
+            attrs['page'] = self.current_page-1
+            self.last_page = self.url_convert(**attrs)
+        if self.To_be_Continue:
+            attrs['page'] = self.current_page+1
+            self.next_page = self.url_convert(**attrs)
+            attrs['page'] = self.current_page+10
+            self.next_ten_page = self.url_convert(**attrs)
+        else:
+            attrs['page'] = self.current_page
+            self.next_page = self.url_convert(**attrs)
+            self.next_ten_page = self.url_convert(**attrs)
+        attrs['page'] = 1
+        self.page_one = self.url_convert(**attrs)
+    def url_convert(self, **attrs):
+        return(self.url+'?'+'&'.join([key+'='+str(attrs[key]) for key in attrs.keys()])) #替url加上參數
+
 
 @app.route('/')
 def redir():
@@ -89,34 +118,22 @@ def main():
         
     SearchRequest.Bebhinn(page, 5, 1)
 
-    current_page = int(SearchRequest.itemdict['NowPage'])
-    To_be_Continue = SearchRequest.itemdict['NextPage']
-    page_one = url_convert('/HouseBoard.html', page=1)
-
-    if current_page == 1:
-        last_page = url_convert('/HouseBoard.html', page=1)
-    else:
-        last_page = url_convert('/HouseBoard.html', page=current_page -1)
-    if To_be_Continue:
-        next_page = url_convert('/HouseBoard.html', page=current_page +1)
-        next_ten_page = url_convert('/HouseBoard.html', page=current_page +10)
-    else:
-        next_page = url_convert('/HouseBoard.html', page=current_page)
-        next_ten_page = url_convert('/HouseBoard.html', page=current_page)
+    turnpageHouseBoard = turnpage(SearchRequest, '/HouseBoard.html')
+    turnpageHouseBoard.pagelink()
               
     return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
                                               itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                               itemdict=SearchRequest.itemdict,
-                           page_one = page_one,
-                           last_page = last_page,
-                           next_page = next_page,
-                           next_ten_page = next_ten_page,
-                           current_page = current_page)
+                           page_one = turnpageHouseBoard.page_one,
+                           last_page = turnpageHouseBoard.last_page,
+                           next_page = turnpageHouseBoard.next_page,
+                           next_ten_page = turnpageHouseBoard.next_ten_page,
+                           current_page = turnpageHouseBoard.current_page)
 
 
 @app.route('/search', methods=['GET'])
 def BoardSearch():
-    try:
+    try: 
         if request.args.get('SearchWord'):
             SearchWord = request.args.get('SearchWord')
         else:
@@ -132,31 +149,17 @@ def BoardSearch():
         SearchRequest = search(SearchWord, SearchType)
         SearchRequest.Bebhinn(page, 5, 1)
 
-        current_page = int(SearchRequest.itemdict['NowPage'])
-        To_be_Continue = SearchRequest.itemdict['NextPage']
-        page_one = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-
-        if current_page == 1:
-            last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=1)
-        else:
-            last_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page -1)
-        if To_be_Continue:
-            next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page +1)
-            next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page +10)
-        else:
-            next_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page)
-            next_ten_page = url_convert('/search', SearchWord=SearchWord, SearchType=SearchType, page=current_page)
-        
-        
-            
+        turnpageSearch = turnpage(SearchRequest, '/search')
+        turnpageSearch.pagelink(SearchWord=SearchWord, SearchType=SearchType)
+                    
         return render_template('HouseBoard.html', itemlist=SearchRequest.itemlist,
                                                   itemattr=['char_name', 'item_name', 'item_price', 'comment', 'start_time'],
                                                   itemdict=SearchRequest.itemdict,
-                               page_one = page_one,
-                               last_page = last_page,
-                               next_page = next_page,
-                               next_ten_page = next_ten_page,
-                               current_page = current_page)
+                                page_one = turnpageSearch.page_one,
+                                last_page = turnpageSearch.last_page,
+                                next_page = turnpageSearch.next_page,
+                                next_ten_page = turnpageSearch.next_ten_page,
+                                current_page = turnpageSearch.current_page)
     except:
         return redirect(url_for('main'))
     
